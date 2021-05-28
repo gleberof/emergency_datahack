@@ -20,6 +20,7 @@ catboost = "^0.25.1"
 xgboost = "^1.4.2"
 basemap = {url = "https://github.com/matplotlib/basemap/archive/master.zip"}
 geopy = "^2.1.0"
+tqdm = "^4.61.0"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"
