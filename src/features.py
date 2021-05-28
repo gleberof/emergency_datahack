@@ -9,7 +9,7 @@ features = {
          },
     "hydro_1day.csv":
         {"year": "numeric",
-         "station_id": int,
+         "station_id": "categorical",
          "month": "numeric",
          "day": "numeric",
          "date": "drop",
@@ -46,6 +46,30 @@ features = {
          "snow_height": "numeric", # 9999 - means bad value
          "snow_coverage_station": "numeric",
          "snow_height_q1": "categorical",
-
+         "snow_height_q2": "categorical",
+         "snow_height_q3": "categorical",
+         "temperature_20cm": "numeric", # 9999 - means bad value
+         "temperature_20cm_qual": "categorical",
+         "temperature_40cm": "numeric", # 9999 - means bad value
+         "temperature_40cm_qual": "categorical",
+         "temperature_80cm": "numeric",  # 9999 - means bad value
+         "temperature_80cm_qual": "categorical",
+         "temperature_120cm": "numeric",  # 9999 - means bad value
+         "temperature_120cm_qual": "categorical",
+         "temperature_160cm": "numeric",  # 9999 - means bad value
+         "temperature_160cm_qual": "categorical",
+         "temperature_240cm": "numeric",  # 9999 - means bad value
+         "temperature_240cm_qual": "categorical",
+         "temperature_320cm": "numeric",  # 9999 - means bad value
+         "temperature_320cm_qual": "categorical",
+         "temperature_ks_5cm": "numeric",  # 9999 - means bad value
+         "temperature_ks_5cm_qual": "categorical",
+         "temperature_ks_10cm": "numeric",  # 9999 - means bad value
+         "temperature_ks_10cm_qual": "categorical",
+         "temperature_ks_15cm": "numeric",  # 9999 - means bad value
+         "temperature_ks_15cm_qual": "categorical",
+         "temperature_ks_20cm": "numeric",  # 9999 - means bad value
+         "temperature_ks_20cm_qual": "categorical",
+         "date": "drop"
         }
 }
