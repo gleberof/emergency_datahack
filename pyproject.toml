@@ -2,7 +2,10 @@
 name = "emergency_hack"
 version = "0.1.0"
 description = ""
-authors = ["Gleb <gleberof@gmail.com>"]
+authors = []
+packages = [
+    { include = "src" }
+]
 
 [tool.poetry.dependencies]
 python = "3.8.6"
@@ -23,7 +26,42 @@ mypy = "^0.812"
 flake8 = "^3.9.2"
 isort = "^5.8.0"
 autoflake = "^1.4"
+pytest = "^6.2.4"
+pre-commit = "^2.13.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 120
+target-version = ['py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.venv
+  | build
+  | dist
+  | notebooks
+  | original
+  | data
+  )/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+src_paths = ["src", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
+]
+
+[tool.poe.tasks]
+force-cuda11 = "python -m pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html"
