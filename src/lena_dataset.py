@@ -33,7 +33,7 @@ class LenaDataset(Dataset):
                        (self.full_df.day > self.last_day_previous_year))
         part_index2 = ((self.full_df.year == year) &\
                        (self.full_df.day < 31+30+31))
-        part_index3 = self.full_df.station_id == station
+        part_index3 = self.full_df.hydro_station_id == station
         feat_matrix = self.full_df.loc[(part_index1 | part_index2) & part_index3,
                                   self.cat_cols + self.num_cols].values
         new_feat_matrix = np.zeros((139, feat_matrix.shape[0]))
