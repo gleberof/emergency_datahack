@@ -39,7 +39,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger = TensorBoardLogger(
-        str(LOGGING_DIR / args.name),
+        str(LOGGING_DIR),
         name=args.name,
         version=args.version,
         log_graph=False,
