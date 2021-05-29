@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  star:
+    container_name: emergency-hack-track-1
+    build:
+      context: .
+    ports:
+      - 6006:6006
+    volumes:
+      - type: bind
+        source: ./data/track_1
+        target: /emergency/data/track_1
+      - type: bind
+        source: ./data/submissions
+        target: /emergency/data/submissions
+      - type: bind
+        source: ./data/model-checkpoints
+        target: /emergency/data/model-checkpoints
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]

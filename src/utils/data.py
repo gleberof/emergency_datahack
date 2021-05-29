@@ -29,7 +29,7 @@ def apply_water_state_encoder(df):
 
     # make new columns
     for i in range(n):
-        df[f"fixed_water_code_{i}_categorical"] = (
+        df[f"fixed_water_code_{i}_numeric"] = (
             df["water_code"]
             .fillna("")
             .str.split(",")
@@ -192,7 +192,7 @@ def add_keys(features_df):
 
 
 def scale_numerical_features(features_df):
-    numerical_cols = [col for col in features_df.columns if "numeric" in col]
+    numerical_cols = [col for col in features_df.columns if "numeric" in col and "water_code" not in col]
     scaler = StandardScaler()
     features_df[numerical_cols] = scaler.fit_transform(features_df[numerical_cols])
 
