@@ -11,6 +11,7 @@ from src.utils.data import (  # add_predecessor_hydro,
 )
 
 if __name__ == "__main__":
+    print("Creating features df...")
     make_water_state_encoder(TRACK1_DIR)
     hydro_1day = load_table(TRACK1_DIR, "hydro_1day.csv")
     meteo_1day = load_table(TRACK1_DIR, "meteo_1day.csv")

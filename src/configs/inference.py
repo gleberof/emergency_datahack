@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src import DEFAULT_CHECKPOINT
+from src import DEFAULT_CHECKPOINT, DEFAULT_SUBMISSION_PATH
 from src.configs.model import BiTransModelConfig
 
 
@@ -10,6 +10,7 @@ class InferenceConfig:
     model: BiTransModelConfig
 
     checkpoint_path: str = str(DEFAULT_CHECKPOINT)
+    submission_path: str = str(DEFAULT_SUBMISSION_PATH)
 
     prediction_thresh: float = 0.23
     gpus: int = 1

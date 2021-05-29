@@ -2,7 +2,6 @@ import hydra
 import pytorch_lightning as pl
 import torch
 
-from src import DATA_DIR
 from src.configs import register_configs
 from src.configs.inference import InferenceConfig
 from src.models import LenaBiTrans
@@ -50,7 +49,7 @@ def inference(cfg: InferenceConfig):
 
     test = datamodule.test.copy()
     test["ice_jam"] = torch.cat(predictions).flatten().numpy()  # type: ignore
-    test.to_csv(DATA_DIR / "submission.csv")
+    test.to_csv(cfg.submission_path)
 
 
 @hydra.main(config_path=None, config_name="inference")

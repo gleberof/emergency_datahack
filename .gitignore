@@ -1,4 +1,15 @@
-data
+data/1_track_extra_train
+data/track_1
+data/*.csv
+data/model-checkpoints/*/*.ckpt
+data/model-checkpoints/*.ckpt
+data/model-checkpoints/*/*.pth
+data/model-checkpoints/*.pth
+data/logs
+data/*.joblib
+data/*.sqlite
+data/submissions/*.csv
+
 outputs
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
