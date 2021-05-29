@@ -1,11 +1,13 @@
-import argparse
-
+import hydra
 import pandas as pd
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import GPUStatsMonitor, ModelCheckpoint
+from optuna.integration import PyTorchLightningPruningCallback
+from pytorch_lightning.callbacks import EarlyStopping, GPUStatsMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from src import DATA_DIR, LOGGING_DIR, MODEL_CHECKPOINTS_DIR, TRACK1_DIR
+from src.configs import register_configs
+from src.configs.train import TrainConfig
 from src.data import LenaDataModule
 from src.models import LenaTrans
 from src.system import LenaSystem
@@ -23,48 +25,39 @@ def get_datamodule(batch_size, num_workers):
     return datamodule
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--name", type=str, default="LenaTrans")
-    parser.add_argument("--version", type=str, default=None)
-    parser.add_argument("--gpus", type=int, default=1)
-    parser.add_argument("--batch-size", type=int, default=128)
-    parser.add_argument("--num-workers", type=int, default=8)
-    parser.add_argument("--rnn-units", type=int, default=128)
-    parser.add_argument("--top-classifier-units", type=int, default=32)
-    parser.add_argument("--alpha", type=float, default=0.25)
-    parser.add_argument("--gamma", type=float, default=2)
-    parser.add_argument("--lr", type=float, default=3e-4)
-    parser.add_argument("--weight-decay", type=float, default=1e-3)
-    args = parser.parse_args()
-
+def train(cfg: TrainConfig, trial=None):
     logger = TensorBoardLogger(
         str(LOGGING_DIR),
-        name=args.name,
-        version=args.version,
+        name=cfg.name,
+        version=cfg.version,
         log_graph=False,
-        default_hp_metric=False,
+        default_hp_metric=True,
     )
 
     checkpoints = ModelCheckpoint(
-        dirpath=str(MODEL_CHECKPOINTS_DIR / args.name),
-        monitor="Val/score",
+        dirpath=str(MODEL_CHECKPOINTS_DIR / cfg.name),
+        monitor="hp_metric",
         verbose=True,
         mode="max",
         save_top_k=-1,
     )
 
+    early_stopping = EarlyStopping(monitor="Val/score")
+    if trial:
+        early_stopping = PyTorchLightningPruningCallback(monitor="Val/score", trial=trial)  # type: ignore
+
     gpu_monitor = GPUStatsMonitor()
 
-    datamodule = get_datamodule(batch_size=args.batch_size, num_workers=args.num_workers)
+    datamodule = get_datamodule(batch_size=cfg.batch_size, num_workers=cfg.num_workers)
 
     # trainer
     trainer = pl.Trainer(
         logger=logger,
-        callbacks=[gpu_monitor, checkpoints],
+        callbacks=[gpu_monitor, checkpoints, early_stopping],
         profiler="simple",
         benchmark=True,
-        gpus=args.gpus
+        gpus=cfg.gpus,
+        max_epochs=cfg.max_epochs
         # enable_pl_optimizer=True,
     )
 
@@ -78,10 +71,22 @@ if __name__ == "__main__":
         numerical_features=datamodule.numerical_features,
         station_col_name="hydro_fixed_station_id_categorical",
         day_col_name="day_target_categorical",
-        rnn_units=args.rnn_units,
-        top_classifier_units=args.top_classifier_units,
+        rnn_units=cfg.rnn_units,
+        top_classifier_units=cfg.top_classifier_units,
     )
 
-    system = LenaSystem(model=model, alpha=args.alpha, gamma=args.gamma, lr=args.lr, weight_decay=args.weight_decay)
+    system = LenaSystem(model=model, alpha=cfg.alpha, gamma=cfg.gamma, lr=cfg.lr, weight_decay=cfg.weight_decay)
 
     trainer.fit(system, datamodule=datamodule)
+
+    return trainer, system, datamodule
+
+
+@hydra.main(config_path=None, config_name="train")
+def main(cfg: TrainConfig):
+    train(cfg=cfg)
+
+
+if __name__ == "__main__":
+    register_configs()
+    main()

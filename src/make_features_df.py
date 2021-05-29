@@ -13,7 +13,6 @@ from src.utils.data import (
 if __name__ == "__main__":
     make_water_state_encoder()
     hydro_1day = load_table("hydro_1day.csv")
-    data = load_table("train.csv")
     meteo_1day = load_table("meteo_1day.csv")
     hydro_coord = load_table("hydro_coord.csv")
     meteo_coord = load_table("meteo_coord.csv")
@@ -28,4 +27,3 @@ if __name__ == "__main__":
     features_df = features_df.drop(columns=bad_columns)
     features_df = add_predecessor_hydro(features_df, flow)
     features_df.to_csv(DATA_DIR / "features.csv")
-    data.to_csv(DATA_DIR / "train.csv")

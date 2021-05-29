@@ -37,8 +37,28 @@ class LenaSystem(pl.LightningModule):
 
         thresh, score = threshold_search(y_proba=y_proba, y_true=y_true)
 
-        self.log("Val/score", score)
         self.log("Val/thresh", thresh)
+        self.log("Val/f1_score", score)
+        self.log("hp_metric", score)
+
+    def test_step(self, batch, batch_idx):
+        out = self(batch["x"].float(), batch["station"].long(), batch["day"].long()).cpu()
+        y = batch["y"].cpu()
+        day = batch["day"].cpu()
+
+        return {"out": out, "y": y, "day": day}
+
+    def test_epoch_end(self, outputs):
+        y_proba = torch.sigmoid(torch.cat([o["out"] for o in outputs])).numpy()
+        y_true = torch.cat([o["y"] for o in outputs]).numpy()
+
+        thresh, score = threshold_search(y_proba=y_proba, y_true=y_true)
+
+        self.log("Test/thresh", thresh)
+        self.log("Test/f1_score", score)
+        self.log("hp_metric", score)
+
+        return score
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(
