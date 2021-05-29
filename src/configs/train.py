@@ -8,7 +8,7 @@ class TrainConfig:
     version: Optional[str] = None
     gpus: int = 1
     batch_size: int = 128
-    num_workers: int = 8
+    num_workers: int = 16
     rnn_units: int = 128
     top_classifier_units: int = 32
     alpha: float = 0.25

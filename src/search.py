@@ -20,15 +20,16 @@ def search(cfg: SearchConfig):
     def objective(trial: optuna.Trial):
 
         train_config.gamma = trial.suggest_float(name="gamma", low=1, high=10)
-        train_config.rnn_units = int(trial.suggest_loguniform(name="rnn_units", low=32, high=512))
+        train_config.rnn_units = int(trial.suggest_loguniform(name="rnn_units/4", low=8, high=128)) * 4
         train_config.top_classifier_units = trial.suggest_int(name="top_classifier_units", low=32, high=128)
 
-        trainer, system, datamodule = train(cfg=train_config)
-        test_results = trainer.test(system, test_dataloaders=[datamodule.test_dataloader()])
-
+        trainer, system, datamodule = train(cfg=train_config, trial=trial)
+        test_results = trainer.test(system, test_dataloaders=[datamodule.val_dataloader()])
         return test_results[0]
 
-    study = optuna.create_study(load_if_exists=True, storage=OPTUNA_LOCAL_DATABASE, direction="maximize")
+    study = optuna.create_study(
+        load_if_exists=True, storage=OPTUNA_LOCAL_DATABASE, direction="maximize", study_name=cfg.study_name
+    )
     study.optimize(objective, n_trials=cfg.n_trials)
 
 
