@@ -130,7 +130,7 @@ class LenaDatasetExtra(Dataset):
 
 
 class LenaDataModule(pl.LightningDataModule):
-    def __init__(self, train, test, features_df, batch_size=128, num_workers=2):
+    def __init__(self, train, test, features_df, batch_size=128, num_workers=2, train_only=True):
         super().__init__()
 
         self.train = train
@@ -138,9 +138,13 @@ class LenaDataModule(pl.LightningDataModule):
         self.features_df = features_df
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.train_only = train_only
 
         self.numerical_features = [c for c in features_df if "numeric" in c]
         self.categorical_features = [c for c in features_df if "categorical" in c]
+
+        if train_only:
+            train_list.extend(val_list)
 
         self.train_ds = LenaDataset(
             self.train.loc[self.train.year.isin(train_list)],
@@ -155,7 +159,7 @@ class LenaDataModule(pl.LightningDataModule):
             self.numerical_features,
         )
         self.test_ds = LenaDataset(
-            self.train.loc[self.train.year.isin(test_list)],
+            self.test.loc[self.test.year.isin(test_list)],
             self.features_df,
             self.categorical_features,
             self.numerical_features,
@@ -176,7 +180,7 @@ class LenaDataModule(pl.LightningDataModule):
             self.valid_ds, sampler=valid_sampler, batch_size=self.batch_size, num_workers=self.num_workers
         )
 
-    def test_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
+    def predict_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
         test_sampler = SequentialSampler(self.test_ds)
         return DataLoader(self.test_ds, sampler=test_sampler, batch_size=self.batch_size, num_workers=self.num_workers)
 

@@ -1,19 +1,20 @@
 from dataclasses import dataclass
 
-from omegaconf import MISSING
+from src import DEFAULT_CHECKPOINT
+from src.configs.model import BiTransModelConfig
 
 
 @dataclass
 class InferenceConfig:
-    checkpoint_path: str = MISSING
+
+    model: BiTransModelConfig
+
+    checkpoint_path: str = str(DEFAULT_CHECKPOINT)
 
     prediction_thresh: float = 0.23
     gpus: int = 1
     batch_size: int = 128
     num_workers: int = 16
-    rnn_units: int = 128
-    top_classifier_units: int = 64
-    feat_trans_width: int = 64
     alpha: float = 0.25
     gamma: float = 2
     lr: float = 3e-4

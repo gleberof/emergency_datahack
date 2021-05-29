@@ -79,9 +79,13 @@ class LenaSystem(pl.LightningModule):
         assert self.prediction_thresh is not None
 
         preds = (
-            torch.sigmoid(self(batch["x"].float(), batch["station"].long(), batch["day"].long()))
-            > self.prediction_thresh
-        ).long()
+            (
+                torch.sigmoid(self(batch["x"].float(), batch["station"].long(), batch["day"].long()))
+                > self.prediction_thresh
+            )
+            .long()
+            .cpu()
+        )
 
         return preds
 

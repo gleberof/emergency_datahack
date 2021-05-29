@@ -1,28 +1,15 @@
 import hydra
-import pandas as pd
 import pytorch_lightning as pl
 from optuna.integration import PyTorchLightningPruningCallback
 from pytorch_lightning.callbacks import EarlyStopping, GPUStatsMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
-from src import DATA_DIR, LOGGING_DIR, MODEL_CHECKPOINTS_DIR, TRACK1_DIR
+from src import LOGGING_DIR, MODEL_CHECKPOINTS_DIR
 from src.configs import register_configs
 from src.configs.train import TrainBiTransConfig
-from src.data import LenaDataModule
 from src.models import LenaBiTrans
 from src.system import LenaSystem
-from src.utils.torch import get_embeddings_projections
-
-
-def get_datamodule(batch_size, num_workers):
-    train = pd.read_csv(TRACK1_DIR / "train.csv")
-    test = pd.read_csv(TRACK1_DIR / "test.csv")
-    features_df = pd.read_csv(DATA_DIR / "features.csv")
-    datamodule = LenaDataModule(
-        train=train, test=test, features_df=features_df, batch_size=batch_size, num_workers=num_workers
-    )
-
-    return datamodule
+from src.utils.torch import get_datamodule, get_embeddings_projections
 
 
 def train(cfg: TrainBiTransConfig, trial=None):
@@ -48,7 +35,7 @@ def train(cfg: TrainBiTransConfig, trial=None):
 
     gpu_monitor = GPUStatsMonitor()
 
-    datamodule = get_datamodule(batch_size=cfg.batch_size, num_workers=cfg.num_workers)
+    datamodule = get_datamodule(batch_size=cfg.batch_size, num_workers=cfg.num_workers, train_only=cfg.train_only)
 
     # trainer
     trainer = pl.Trainer(
@@ -57,7 +44,8 @@ def train(cfg: TrainBiTransConfig, trial=None):
         profiler="simple",
         benchmark=True,
         gpus=cfg.gpus,
-        max_epochs=cfg.max_epochs
+        max_epochs=cfg.max_epochs,
+        val_check_interval=1 if not cfg.train_only else 1000
         # enable_pl_optimizer=True,
     )
 
@@ -71,9 +59,9 @@ def train(cfg: TrainBiTransConfig, trial=None):
         numerical_features=datamodule.numerical_features,
         station_col_name="hydro_fixed_station_id_categorical",
         day_col_name="day_target_categorical",
-        rnn_units=cfg.rnn_units,
-        top_classifier_units=cfg.top_classifier_units,
-        feat_trans_width=cfg.feat_trans_width,
+        rnn_units=cfg.model.rnn_units,
+        top_classifier_units=cfg.model.top_classifier_units,
+        feat_trans_width=cfg.model.feat_trans_width,
     )
 
     system = LenaSystem(model=model, alpha=cfg.alpha, gamma=cfg.gamma, lr=cfg.lr, weight_decay=cfg.weight_decay)
