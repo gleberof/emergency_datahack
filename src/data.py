@@ -154,7 +154,12 @@ class LenaDataModule(pl.LightningDataModule):
             self.categorical_features,
             self.numerical_features,
         )
-        self.test_ds = LenaDataset(self.test, self.features_df, self.categorical_features, self.numerical_features)
+        self.test_ds = LenaDataset(
+            self.train.loc[self.train.year.isin(test_list)],
+            self.features_df,
+            self.categorical_features,
+            self.numerical_features,
+        )
 
     def setup(self, stage: Optional[str] = None) -> None:
         pass
