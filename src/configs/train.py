@@ -27,6 +27,7 @@ class TrainBiTransConfig:
 
     name: str = "LenaBiTrans"
     train_only: bool = False
+    log_graph: bool = False
     version: Optional[str] = None
     gpus: int = 1
     batch_size: int = 128

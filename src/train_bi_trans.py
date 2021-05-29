@@ -17,7 +17,7 @@ def train(cfg: TrainBiTransConfig, trial=None):
         str(LOGGING_DIR),
         name=cfg.name,
         version=cfg.version,
-        log_graph=False,
+        log_graph=cfg.log_graph,
         default_hp_metric=True,
     )
 
@@ -45,7 +45,7 @@ def train(cfg: TrainBiTransConfig, trial=None):
         benchmark=True,
         gpus=cfg.gpus,
         max_epochs=cfg.max_epochs,
-        val_check_interval=1 if not cfg.train_only else 1000
+        val_check_interval=1 if not cfg.train_only else 1000,
         # enable_pl_optimizer=True,
     )
 
