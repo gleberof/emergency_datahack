@@ -1,7 +1,15 @@
 from src import DATA_DIR
-from src.utils.data import add_keys, encode_categorical_features, load_table, merge_tables, scale_numerical_features
+from src.utils.data import (
+    add_keys,
+    encode_categorical_features,
+    load_table,
+    make_water_state_encoder,
+    merge_tables,
+    scale_numerical_features,
+)
 
 if __name__ == "__main__":
+    make_water_state_encoder()
     hydro_1day = load_table("hydro_1day.csv")
     data = load_table("train.csv")
     meteo_1day = load_table("meteo_1day.csv")
