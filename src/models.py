@@ -102,13 +102,6 @@ class LenaTrans(nn.Module):
         )
         self._day_embedding = self._create_embedding_projection(*embeddings_projections[day_col_name], padding_idx=None)
 
-        self._gru = nn.GRU(
-            input_size=sum([embeddings_projections[x][1] for x in cat_features]) + len(numerical_features),
-            hidden_size=rnn_units,
-            batch_first=True,
-            bidirectional=False,
-        )
-
         self.config = AlbertConfig(
             3,  # not used
             embedding_size=sum([embeddings_projections[x][1] for x in cat_features]) + len(numerical_features),
@@ -204,13 +197,6 @@ class LenaTransExtra(nn.Module):
             *embeddings_projections[station_col_name], padding_idx=None
         )
         self._day_embedding = self._create_embedding_projection(*embeddings_projections[day_col_name], padding_idx=None)
-
-        self._gru = nn.GRU(
-            input_size=sum([embeddings_projections[x][1] for x in cat_features]) + len(numerical_features),
-            hidden_size=rnn_units,
-            batch_first=True,
-            bidirectional=False,
-        )
 
         self.config = AlbertConfig(
             3,  # not used
