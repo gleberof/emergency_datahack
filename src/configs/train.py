@@ -15,3 +15,4 @@ class TrainConfig:
     gamma: float = 2
     lr: float = 3e-4
     weight_decay: float = 1e-3
+    max_epochs: int = 20

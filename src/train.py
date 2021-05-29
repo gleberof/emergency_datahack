@@ -24,8 +24,7 @@ def get_datamodule(batch_size, num_workers):
     return datamodule
 
 
-@hydra.main(config_path=None, config_name="train")
-def main(cfg: TrainConfig):
+def train(cfg: TrainConfig):
     logger = TensorBoardLogger(
         str(LOGGING_DIR),
         name=cfg.name,
@@ -73,6 +72,13 @@ def main(cfg: TrainConfig):
     system = LenaSystem(model=model, alpha=cfg.alpha, gamma=cfg.gamma, lr=cfg.lr, weight_decay=cfg.weight_decay)
 
     trainer.fit(system, datamodule=datamodule)
+
+    return trainer, system, datamodule
+
+
+@hydra.main(config_path=None, config_name="train")
+def main(cfg: TrainConfig):
+    train(cfg=cfg)
 
 
 if __name__ == "__main__":
