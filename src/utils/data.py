@@ -28,7 +28,7 @@ def apply_water_state_encoder(df):
 
     # make new columns
     for i in range(n):
-        df[f"fixed_water_code_{i}_categorical"] = (
+        df[f"fixed_water_code_{i}_numeric"] = (
             df["water_code"]
             .fillna("")
             .str.split(",")

@@ -73,10 +73,13 @@ class LenaDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        self.numerical_features = [c for c in features_df if c.endswith("numeric")] + [
-            c for c in features_df if c.startswith("hydro_fixed_water_code")
-        ]
+        self.numerical_features = [c for c in features_df if c.endswith("numeric")]
         self.categorical_features = [c for c in features_df if c.endswith("categorical")]
+
+        print("Numerical Features")
+        print(self.numerical_features)
+        print("Categorical Features")
+        print(self.categorical_features)
 
         self.train_ds = LenaDataset(
             self.train.loc[self.train.year.isin(train_list)],
