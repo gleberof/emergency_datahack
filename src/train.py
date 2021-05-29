@@ -43,12 +43,12 @@ if __name__ == "__main__":
         name=args.name,
         version=args.version,
         log_graph=False,
-        default_hp_metric=False,
+        default_hp_metric=True,
     )
 
     checkpoints = ModelCheckpoint(
         dirpath=str(MODEL_CHECKPOINTS_DIR / args.name),
-        monitor="Val/score",
+        monitor="hp_metric",
         verbose=True,
         mode="max",
         save_top_k=-1,
