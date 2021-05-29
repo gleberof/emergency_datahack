@@ -1,5 +1,6 @@
 import hydra
 import pytorch_lightning as pl
+import torch
 from optuna.integration import PyTorchLightningPruningCallback
 from pytorch_lightning.callbacks import EarlyStopping, GPUStatsMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -43,9 +44,9 @@ def train(cfg: TrainBiTransConfig, trial=None):
         callbacks=[gpu_monitor, checkpoints, early_stopping],
         profiler="simple",
         benchmark=True,
-        gpus=cfg.gpus,
+        gpus=cfg.gpus if torch.cuda.is_available() else None,
         max_epochs=cfg.max_epochs,
-        val_check_interval=1 if not cfg.train_only else 1000,
+        val_check_interval=1.0 if not cfg.train_only else 1000,
         gradient_clip_val=cfg.gradient_clip_val
         # enable_pl_optimizer=True,
     )
