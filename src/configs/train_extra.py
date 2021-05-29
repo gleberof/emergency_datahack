@@ -3,8 +3,8 @@ from typing import Optional
 
 
 @dataclass
-class TrainConfig:
-    name: str = "LenaTrans"
+class TrainExtraConfig:
+    name: str = "LenaTransExtra"
     version: Optional[str] = None
     gpus: int = 1
     batch_size: int = 128

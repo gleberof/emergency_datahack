@@ -4,13 +4,13 @@ import pandas as pd
 from geopy.distance import geodesic
 from sklearn.preprocessing import LabelEncoder, StandardScaler  # feature_range=(-1,1)
 
-from src import DATA_DIR, TRACK1_DIR
+from src import DATA_DIR
 from src.features import features
 
 # Подтянем ближайшую к гидростанции метеостанцию
 
 
-def make_water_state_encoder(base_path=TRACK1_DIR, postfix=""):
+def make_water_state_encoder(base_path, postfix=""):
     wdf = pd.read_csv(base_path / ("reference_water_codes" + postfix + ".csv"))
     labels = wdf["water_code"].values
     le = LabelEncoder()
@@ -29,14 +29,14 @@ def apply_water_state_encoder(df):
 
     # make new columns
     for i in range(n):
-        df[f"fixed_water_code_{i}_numeric"] = (
+        df[f"fixed_water_code_{i}_categorical"] = (
             df["water_code"]
             .fillna("")
             .str.split(",")
             .apply(lambda s: str(rev_mapping[i]) in s if s else -1)
             .astype("int32")
         )
-        df[f"fixed_water_code_{i}_numeric_namask"] = 1
+        df[f"fixed_water_code_{i}_namask"] = 1
 
     df = df.drop(columns=["water_code"])
 
@@ -50,7 +50,7 @@ def fix_column(df, column, column_type, nan_encoding):
         if nan_encoding:
             df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, np.nan)
 
-        df[f"fixed_{column}_{column_type}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
+        df[f"fixed_{column}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].fillna(
             df[f"fixed_{column}_{column_type}"].median()
         )
@@ -59,7 +59,7 @@ def fix_column(df, column, column_type, nan_encoding):
         df[f"fixed_{column}_{column_type}"] = df[column]
         if nan_encoding:
             df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, np.nan)
-        df[f"fixed_{column}_{column_type}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
+        df[f"fixed_{column}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].fillna(-1)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].astype("category")
 
@@ -72,7 +72,7 @@ def fix_column(df, column, column_type, nan_encoding):
     elif column_type == "date":
         df[f"fixed_{column}_{column_type}"] = df[column]
         df[f"fixed_{column}_{column_type}"] = pd.to_datetime(df[f"fixed_{column}_{column_type}"])
-        df[f"fixed_{column}_{column_type}_namask"] = 1
+        df[f"fixed_{column}_namask"] = 1
 
 
 def fix_df(df, df_name):
@@ -89,8 +89,8 @@ def fix_df(df, df_name):
     return df
 
 
-def load_table(name):
-    table = pd.read_csv(TRACK1_DIR / name)
+def load_table(base_name, name):
+    table = pd.read_csv(base_name / name)
     fixed_table = fix_df(table, name)
 
     return fixed_table
@@ -192,7 +192,7 @@ def add_keys(features_df):
 
 
 def scale_numerical_features(features_df):
-    numerical_cols = [col for col in features_df.columns if col.endswith("_numeric")]
+    numerical_cols = [col for col in features_df.columns if "numeric" in col]
     scaler = StandardScaler()
     features_df[numerical_cols] = scaler.fit_transform(features_df[numerical_cols])
 
@@ -200,9 +200,10 @@ def scale_numerical_features(features_df):
 
 
 def encode_categorical_features(features_df):
-    categorical_cols = [col for col in features_df.columns if col.endswith("_categorical")]
+    categorical_cols = [col for col in features_df.columns if "categorical" in col]
     for cat_col in categorical_cols:
         encoder = LabelEncoder()
         features_df[cat_col] = encoder.fit_transform(features_df[cat_col])
+        features_df[cat_col] = features_df[cat_col].astype("int32")
 
     return features_df
