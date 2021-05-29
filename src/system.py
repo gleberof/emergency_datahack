@@ -89,6 +89,13 @@ class LenaSystem(pl.LightningModule):
 
         return preds
 
+    @property
+    def example_input_array(self) -> Any:
+        batch = next(iter(self.train_dataloader()))
+        example_input_array = (batch["x"].float(), batch["station"].long(), batch["day"].long())
+
+        return example_input_array
+
 
 class LenaSystemExtra(pl.LightningModule):
     def __init__(self, model, alpha=0.25, gamma=2, lr=3e-4, weight_decay=0.001):

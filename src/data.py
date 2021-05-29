@@ -140,8 +140,8 @@ class LenaDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.train_only = train_only
 
-        self.numerical_features = [c for c in features_df if "numeric" in c]
-        self.categorical_features = [c for c in features_df if "categorical" in c]
+        self.numerical_features = [c for c in features_df if "numeric" in c and "namask" not in c]
+        self.categorical_features = [c for c in features_df if "categorical" in c and "namask" not in c]
 
         if train_only:
             train_list.extend(val_list)
