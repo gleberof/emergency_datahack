@@ -37,5 +37,5 @@ class TrainBiTransConfig:
     gamma: float = 2.5
     lr: float = 1e-3
     weight_decay: float = 1e-3
-    max_epochs: int = 20
+    max_epochs: int = 200
     patience: int = 20
