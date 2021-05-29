@@ -37,8 +37,9 @@ class LenaSystem(pl.LightningModule):
 
         thresh, score = threshold_search(y_proba=y_proba, y_true=y_true)
 
-        self.log("Val/score", score)
         self.log("Val/thresh", thresh)
+        self.log("Val/f1_score", score)
+        self.log("hp_metric", score)
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(
