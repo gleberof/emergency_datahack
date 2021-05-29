@@ -1,6 +1,8 @@
 from src import DATA_DIR
+from src.features import back_flow_graph_known as flow
 from src.utils.data import (
     add_keys,
+    add_predecessor_hydro,
     encode_categorical_features,
     load_table,
     make_water_state_encoder,
@@ -23,4 +25,5 @@ if __name__ == "__main__":
         "meteo_lat_lon",
     ]
     features_df = features_df.drop(columns=bad_columns)
+    features_df = add_predecessor_hydro(features_df, flow)
     features_df.to_csv(DATA_DIR / "features.csv")
