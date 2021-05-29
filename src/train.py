@@ -1,7 +1,8 @@
 import hydra
 import pandas as pd
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import GPUStatsMonitor, ModelCheckpoint
+from optuna.integration import PyTorchLightningPruningCallback
+from pytorch_lightning.callbacks import EarlyStopping, GPUStatsMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from src import DATA_DIR, LOGGING_DIR, MODEL_CHECKPOINTS_DIR, TRACK1_DIR
@@ -24,8 +25,7 @@ def get_datamodule(batch_size, num_workers):
     return datamodule
 
 
-@hydra.main(config_path=None, config_name="train")
-def main(cfg: TrainConfig):
+def train(cfg: TrainConfig, trial=None):
     logger = TensorBoardLogger(
         str(LOGGING_DIR),
         name=cfg.name,
@@ -42,6 +42,10 @@ def main(cfg: TrainConfig):
         save_top_k=-1,
     )
 
+    early_stopping = EarlyStopping(monitor="Val/score")
+    if trial:
+        early_stopping = PyTorchLightningPruningCallback(monitor="Val/score", trial=trial)  # type: ignore
+
     gpu_monitor = GPUStatsMonitor()
 
     datamodule = get_datamodule(batch_size=cfg.batch_size, num_workers=cfg.num_workers)
@@ -49,10 +53,11 @@ def main(cfg: TrainConfig):
     # trainer
     trainer = pl.Trainer(
         logger=logger,
-        callbacks=[gpu_monitor, checkpoints],
+        callbacks=[gpu_monitor, checkpoints, early_stopping],
         profiler="simple",
         benchmark=True,
-        gpus=cfg.gpus
+        gpus=cfg.gpus,
+        max_epochs=cfg.max_epochs
         # enable_pl_optimizer=True,
     )
 
@@ -73,6 +78,13 @@ def main(cfg: TrainConfig):
     system = LenaSystem(model=model, alpha=cfg.alpha, gamma=cfg.gamma, lr=cfg.lr, weight_decay=cfg.weight_decay)
 
     trainer.fit(system, datamodule=datamodule)
+
+    return trainer, system, datamodule
+
+
+@hydra.main(config_path=None, config_name="train")
+def main(cfg: TrainConfig):
+    train(cfg=cfg)
 
 
 if __name__ == "__main__":
