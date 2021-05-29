@@ -46,6 +46,7 @@ def train(cfg: TrainBiTransConfig, trial=None):
         gpus=cfg.gpus,
         max_epochs=cfg.max_epochs,
         val_check_interval=1 if not cfg.train_only else 1000,
+        gradient_clip_val=cfg.gradient_clip_val
         # enable_pl_optimizer=True,
     )
 
