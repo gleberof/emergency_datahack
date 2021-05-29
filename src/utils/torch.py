@@ -1,7 +1,11 @@
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 from sklearn.metrics import precision_recall_curve
+
+from src import DATA_DIR, TRACK1_DIR
+from src.data import LenaDataModule
 
 
 def emb_sz_rule(n_cat: int) -> int:
@@ -125,3 +129,19 @@ class BinaryFocalLossWithLogits(nn.Module):
 
     def forward(self, input: torch.Tensor, target: torch.Tensor):
         return binary_focal_loss_with_logits(input, target, self.alpha, self.gamma, self.reduction, self.eps)
+
+
+def get_datamodule(batch_size, num_workers, train_only):
+    train = pd.read_csv(TRACK1_DIR / "train.csv")
+    test = pd.read_csv(TRACK1_DIR / "test.csv")
+    features_df = pd.read_csv(DATA_DIR / "features.csv")
+    datamodule = LenaDataModule(
+        train=train,
+        test=test,
+        features_df=features_df,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        train_only=train_only,
+    )
+
+    return datamodule

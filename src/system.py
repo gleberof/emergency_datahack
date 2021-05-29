@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 import joblib
 import pytorch_lightning as pl
 import torch
@@ -7,13 +9,15 @@ from src.utils.torch import BinaryFocalLossWithLogits, threshold_search
 
 
 class LenaSystem(pl.LightningModule):
-    def __init__(self, model, alpha=0.25, gamma=2, lr=3e-4, weight_decay=0.001):
+    def __init__(self, model, alpha=0.25, gamma=2, lr=3e-4, weight_decay=0.001, prediction_thresh=None):
         super().__init__()
         self.model = model
 
         self.save_hyperparameters({"alpha": alpha, "gamma": gamma, "lr": lr, "weight_decay": weight_decay})
 
         self.criterion = BinaryFocalLossWithLogits(alpha=self.hparams.alpha, gamma=self.hparams.gamma)
+
+        self.prediction_thresh = prediction_thresh
 
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)
@@ -70,6 +74,20 @@ class LenaSystem(pl.LightningModule):
         )
 
         return optimizer
+
+    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: Optional[int] = None) -> Any:
+        assert self.prediction_thresh is not None
+
+        preds = (
+            (
+                torch.sigmoid(self(batch["x"].float(), batch["station"].long(), batch["day"].long()))
+                > self.prediction_thresh
+            )
+            .long()
+            .cpu()
+        )
+
+        return preds
 
 
 class LenaSystemExtra(pl.LightningModule):
