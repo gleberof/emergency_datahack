@@ -1,4 +1,5 @@
 import joblib
+import numpy as np
 import pandas as pd
 from geopy.distance import geodesic
 from sklearn.preprocessing import LabelEncoder, StandardScaler  # feature_range=(-1,1)
@@ -35,6 +36,7 @@ def apply_water_state_encoder(df):
             .apply(lambda s: str(rev_mapping[i]) in s if s else -1)
             .astype("int32")
         )
+        df[f"fixed_water_code_{i}_numeric_namask"] = 1
 
     df = df.drop(columns=["water_code"])
 
@@ -46,7 +48,9 @@ def fix_column(df, column, column_type, nan_encoding):
         df[f"fixed_{column}_{column_type}"] = df[column]
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].astype("float32")
         if nan_encoding:
-            df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, None)
+            df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, np.nan)
+
+        df[f"fixed_{column}_{column_type}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].fillna(
             df[f"fixed_{column}_{column_type}"].median()
         )
@@ -54,7 +58,8 @@ def fix_column(df, column, column_type, nan_encoding):
     elif column_type == "categorical":
         df[f"fixed_{column}_{column_type}"] = df[column]
         if nan_encoding:
-            df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, None)
+            df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, np.nan)
+        df[f"fixed_{column}_{column_type}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].fillna(-1)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].astype("category")
 
@@ -67,6 +72,7 @@ def fix_column(df, column, column_type, nan_encoding):
     elif column_type == "date":
         df[f"fixed_{column}_{column_type}"] = df[column]
         df[f"fixed_{column}_{column_type}"] = pd.to_datetime(df[f"fixed_{column}_{column_type}"])
+        df[f"fixed_{column}_{column_type}_namask"] = 1
 
 
 def fix_df(df, df_name):
@@ -132,18 +138,49 @@ def merge_tables(hydro_1day, meteo_1day, hydro_coord, meteo_coord):
     hydro_coord_with_closest_meteo_coord = merge_closest_meteo_to_hydro(hydro_coord, meteo_coord)
 
     hydro_1day = hydro_1day.merge(
-        hydro_coord_with_closest_meteo_coord[["hydro_fixed_station_id_categorical", "hydro_closest_meteo_station_id"]]
+        hydro_coord_with_closest_meteo_coord[["hydro_fixed_station_id_categorical", "hydro_closest_meteo_station_id"]],
+        how="left",
     )
 
     hydro_1day = hydro_1day.merge(
         meteo_1day,
         left_on=["hydro_closest_meteo_station_id", "hydro_fixed_date_date"],
         right_on=["meteo_fixed_station_id_categorical", "meteo_fixed_date_date"],
+        how="left",
     )
 
-    hydro_1day = hydro_1day.merge(hydro_coord_with_closest_meteo_coord, on="hydro_fixed_station_id_categorical")
+    # hydro_1day = hydro_1day.merge(hydro_coord_with_closest_meteo_coord,
+    #                               on="hydro_fixed_station_id_categorical", how='left')
+
+    for k, v in dict(hydro_1day.dtypes).items():
+        if str(v) != "category":
+            hydro_1day[k].fillna(0, inplace=True)
 
     return hydro_1day
+
+
+def add_predecessor_hydro(features_df, flow):
+    # add predecessor
+    features_df["pred_hydro_station_id"] = features_df["hydro_station_id"].map(flow)
+    # merge predecessor data
+    features_df = features_df.merge(
+        features_df,
+        how="left",
+        left_on=["pred_hydro_station_id", "hydro_fixed_year_categorical", "hydro_fixed_day_categorical"],
+        right_on=["hydro_station_id", "hydro_fixed_year_categorical", "hydro_fixed_day_categorical"],
+        suffixes=("_my", "_pred"),
+    )
+    # fill na
+    pred_features_name = ["year", "month", "day", "hydro_station_id"]
+
+    for col in features_df.columns:
+        if col[-5:] == "_pred":
+            if any([feat in col for feat in pred_features_name]):
+                features_df.drop(columns=[col], inplace=True)
+            else:
+                features_df[col].fillna(0, inplace=True)
+
+    return features_df
 
 
 def add_keys(features_df):
