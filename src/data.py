@@ -130,7 +130,7 @@ class LenaDatasetExtra(Dataset):
 
 
 class LenaDataModule(pl.LightningDataModule):
-    def __init__(self, train, test, features_df, batch_size=128, num_workers=2, train_only=True):
+    def __init__(self, train, test, features_df, batch_size=128, num_workers=2, train_only=False):
         super().__init__()
 
         self.train = train
@@ -143,23 +143,27 @@ class LenaDataModule(pl.LightningDataModule):
         self.numerical_features = [c for c in features_df if "numeric" in c and "namask" not in c]
         self.categorical_features = [c for c in features_df if "categorical" in c and "namask" not in c]
 
+        self.train_list = train_list.copy()
+        self.val_list = val_list.copy()
+        self.test_list = test_list.copy()
+
         if train_only:
-            train_list.extend(val_list)
+            self.train_list.extend(self.val_list)
 
         self.train_ds = LenaDataset(
-            self.train.loc[self.train.year.isin(train_list)],
+            self.train.loc[self.train.year.isin(self.train_list)],
             self.features_df,
             self.categorical_features,
             self.numerical_features,
         )
         self.valid_ds = LenaDataset(
-            self.train.loc[self.train.year.isin(val_list)],
+            self.train.loc[self.train.year.isin(self.val_list)],
             self.features_df,
             self.categorical_features,
             self.numerical_features,
         )
         self.test_ds = LenaDataset(
-            self.test.loc[self.test.year.isin(test_list)],
+            self.test.loc[self.test.year.isin(self.test_list)],
             self.features_df,
             self.categorical_features,
             self.numerical_features,

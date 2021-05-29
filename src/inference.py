@@ -15,7 +15,7 @@ def inference(cfg: InferenceConfig):
     # trainer
     trainer = pl.Trainer(
         benchmark=True,
-        gpus=cfg.gpus,
+        gpus=cfg.gpus if torch.cuda.is_available() else None,
         max_epochs=cfg.max_epochs
         # enable_pl_optimizer=True,
     )
