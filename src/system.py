@@ -84,6 +84,19 @@ class LenaSystemExtra(pl.LightningModule):
         self.label_encoder = joblib.load(DATA_DIR / "dict_water_codes.joblib")
         self.target_code_index = self.label_encoder.classes_.tolist().index(12)
 
+        self.class_weights = None
+
+    def on_train_start(self) -> None:
+        self.class_weights = torch.tensor(
+            [
+                1e-3 / (1e-3 + self.trainer.datamodule.train_ds.full_df[c].mean().item())  # type: ignore
+                for c in self.trainer.datamodule.target_cols  # type: ignore
+            ],
+            device=self.device,
+        )
+        print(self.class_weights)
+        self.criterion = torch.nn.BCEWithLogitsLoss(weight=self.class_weights)
+
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)
 

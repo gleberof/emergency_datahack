@@ -187,9 +187,9 @@ class LenaDataModuleExtra(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        self.numerical_features = [c for c in features_df if "numeric" in c]
-        self.categorical_features = [c for c in features_df if "categorical" in c]
-        self.target_cols = [c for c in features_df if "water_code_" in c]
+        self.numerical_features = [c for c in features_df if "numeric" in c and "namask" not in c]
+        self.categorical_features = [c for c in features_df if "categorical" in c and "namask" not in c]
+        self.target_cols = [c for c in features_df if "water_code_" in c and "namask" not in c]
 
         self.train_ds = LenaDatasetExtra(
             full_df=self.features_df.loc[self.features_df.year.isin(train_list)].reset_index(drop=True).copy(),
