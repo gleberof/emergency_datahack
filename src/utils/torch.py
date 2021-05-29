@@ -14,7 +14,7 @@ def get_embeddings_projections(categorical_features, features_df):
     for cat_col in categorical_features:
         cardinality = features_df[cat_col].max() + 1
         transactions_cat_features[cat_col] = (cardinality, emb_sz_rule(cardinality))
-    transactions_cat_features["day_target_categorical"] = (45, emb_sz_rule(45))
+    transactions_cat_features["day_target_categorical"] = (367, emb_sz_rule(367))
 
     return transactions_cat_features
 

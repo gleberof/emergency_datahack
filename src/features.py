@@ -71,6 +71,7 @@ features = {
         "temperature_ks_20cm": (("numeric", 9999),),
         "temperature_ks_20cm_qual": (("categorical", None),),
         "date": (("date", None),),
+        "target_year": (("drop", None),),
     },
     "hydro_coord.csv": {
         "station_id": (("categorical", None),),

@@ -3,13 +3,13 @@ import pandas as pd
 from geopy.distance import geodesic
 from sklearn.preprocessing import LabelEncoder, StandardScaler  # feature_range=(-1,1)
 
-from src import DATA_DIR, TRACK1_DIR
+from src import DATA_DIR
 from src.features import features
 
 # Подтянем ближайшую к гидростанции метеостанцию
 
 
-def make_water_state_encoder(base_path=TRACK1_DIR, postfix=""):
+def make_water_state_encoder(base_path, postfix=""):
     wdf = pd.read_csv(base_path / ("reference_water_codes" + postfix + ".csv"))
     labels = wdf["water_code"].values
     le = LabelEncoder()
@@ -28,7 +28,7 @@ def apply_water_state_encoder(df):
 
     # make new columns
     for i in range(n):
-        df[f"fixed_water_code_{i}_numeric"] = (
+        df[f"fixed_water_code_{i}_categorical"] = (
             df["water_code"]
             .fillna("")
             .str.split(",")
@@ -83,8 +83,8 @@ def fix_df(df, df_name):
     return df
 
 
-def load_table(name):
-    table = pd.read_csv(TRACK1_DIR / name)
+def load_table(base_name, name):
+    table = pd.read_csv(base_name / name)
     fixed_table = fix_df(table, name)
 
     return fixed_table
