@@ -1,5 +1,7 @@
 from src import DATA_DIR, TRACK1_DIR
-from src.utils.data import (
+
+# from src.features import back_flow_graph_known as flow
+from src.utils.data import (  # add_predecessor_hydro,
     add_keys,
     encode_categorical_features,
     load_table,
@@ -18,9 +20,5 @@ if __name__ == "__main__":
     features_df = add_keys(features_df)
     features_df = scale_numerical_features(features_df)
     features_df = encode_categorical_features(features_df)
-    bad_columns = [col for col in features_df.columns if (col.endswith("_x") or col.endswith("_y"))] + [
-        "hydro_lat_lon",
-        "meteo_lat_lon",
-    ]
-    features_df = features_df.drop(columns=bad_columns)
-    features_df.to_csv(DATA_DIR / "features.csv")
+    # features_df = add_predecessor_hydro(features_df, flow)
+    features_df.to_csv(DATA_DIR / "features.csv", index=False)

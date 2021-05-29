@@ -18,9 +18,4 @@ if __name__ == "__main__":
     features_df = add_keys(features_df)
     features_df = scale_numerical_features(features_df)
     features_df = encode_categorical_features(features_df)
-    bad_columns = [col for col in features_df.columns if (col.endswith("_x") or col.endswith("_y"))] + [
-        "hydro_lat_lon",
-        "meteo_lat_lon",
-    ]
-    features_df = features_df.drop(columns=bad_columns)
-    features_df.to_csv(DATA_DIR / "features_extra.csv")
+    features_df.to_csv(DATA_DIR / "features_extra.csv", index=False)

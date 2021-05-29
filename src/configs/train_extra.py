@@ -16,3 +16,4 @@ class TrainExtraConfig:
     lr: float = 3e-4
     weight_decay: float = 1e-3
     max_epochs: int = 20
+    patience: int = 20

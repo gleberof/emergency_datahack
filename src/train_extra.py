@@ -38,7 +38,7 @@ def train(cfg: TrainExtraConfig, trial=None):
         save_top_k=-1,
     )
 
-    early_stopping = EarlyStopping(monitor="Val/f1_score")
+    early_stopping = EarlyStopping(monitor="Val/f1_score", patience=cfg.patience)
     if trial:
         early_stopping = PyTorchLightningPruningCallback(monitor="Val/f1_score", trial=trial)  # type: ignore
 

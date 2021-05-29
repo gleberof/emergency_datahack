@@ -34,7 +34,7 @@ test_list = [2001, 2003, 2005, 2012, 2013, 1989, 1993, 1997, 2004]
 class LenaDataset(Dataset):
     def __init__(self, label_df, full_df, cat_cols, num_cols, last_day_previous_year=365 - (31 + 30 + 31)):
         self.label_df = label_df.copy()
-        self.full_df = full_df.copy()
+        self.full_df = full_df.drop(columns=[c for c in full_df.columns if "namask" in c or "_pred" in c]).copy()
 
         self.cat_cols = list(cat_cols)
         self.num_cols = list(num_cols)
@@ -73,7 +73,7 @@ class LenaDatasetExtra(Dataset):
         mode="train",
     ):
         self.mode = mode
-        self.full_df = full_df.copy()
+        self.full_df = full_df.drop(columns=[c for c in full_df.columns if "namask" in c or "_pred" in c]).copy()
 
         if mode == "train":
             self.target_df = self.full_df[(self.full_df["day"] >= 31) & (self.full_df["day"] <= 150)]
