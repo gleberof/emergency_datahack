@@ -9,7 +9,7 @@ https://emergencydatahack.ru
 * `Emergency Hack 2021.pdf` - презентация проекта
 
 # Воспроизводимость
-Следующие ноутбуки содержат обучение модели и генерацию файла с предсказаниями. Их можно запустить на ![Google Colab](https://colab.research.google.com/)
+Следующие ноутбуки содержат обучение модели и генерацию файла с предсказаниями. Их можно запустить на [Google Colab](https://colab.research.google.com/). Ноутбук обучения содержит в себе код загрузки данных.
  - `notebooks/train.ipynb`
  - `notebooks/inference.ipynb`
 
