@@ -2,6 +2,11 @@
 
 https://emergencydatahack.ru
 
+# Reproducibility
+Run with Google Colab
+ - `notebooks/train.ipynb`
+ - `notebooks/inference.ipynb`
+
 # Installation
 ```bash
 poetry install
