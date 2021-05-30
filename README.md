@@ -4,6 +4,9 @@
 
 https://emergencydatahack.ru
 
+# Модель **LenaBiTrans**
+![LenaBiTrans](resources/LenaBiTrans.png)
+
 # Структура каталога
 * `src` - код проекта
 * `notebooks` - ноутбуки проекта (эксперименты и анализ данных)
