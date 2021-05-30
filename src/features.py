@@ -147,6 +147,8 @@ features = {
         "soil_surface_alco_temperature": (("numeric", None),),
         "soil_surface_alco_temperature_qual": (("categorical", None),),
         "soil_surface_temperature_min_before": (("numeric", None),),
+        "soil_surface_temperature_min_before_qual": (("categorical", None),),
+        "soil_surface_temperature_max_before": (("numeric", None),),
         "soil_surface_temperature_max_before_qual": (("categorical", None),),
         "soil_surface_max_temperature": (("numeric", None),),
         "soil_surface_max_temperature_qual": (("categorical", None),),
