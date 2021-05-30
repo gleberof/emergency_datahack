@@ -26,7 +26,8 @@ def search(cfg: SearchBiTransConfig):
 
         trainer, system, datamodule = train(cfg=train_config, trial=trial)
         test_results = trainer.test(system, test_dataloaders=[datamodule.val_dataloader()])
-        return test_results[0]
+
+        return test_results[0]["Test/f1_score"]
 
     study = optuna.create_study(
         load_if_exists=True, storage=OPTUNA_LOCAL_DATABASE, direction="maximize", study_name=cfg.study_name
