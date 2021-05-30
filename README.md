@@ -1,6 +1,6 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-# Emergeny Hack 2021 - Команда "Звездочка", 1й трек
+# Emergency Hack 2021 - Команда "Звездочка", 1-ый трек
 
 https://emergencydatahack.ru
 
