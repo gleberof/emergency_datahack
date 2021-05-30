@@ -49,7 +49,7 @@ def inference(cfg: InferenceConfig):
 
     test = datamodule.test.copy()
     test["ice_jam"] = torch.cat(predictions).flatten().numpy()  # type: ignore
-    test.to_csv(cfg.submission_path)
+    test.to_csv(cfg.submission_path, index=False)
 
 
 @hydra.main(config_path=None, config_name="inference")

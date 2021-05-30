@@ -36,7 +36,7 @@ def apply_water_state_encoder(df):
             .apply(lambda s: str(rev_mapping[i]) in s if s else -1)
             .astype("int32")
         )
-        df[f"fixed_water_code_{i}_namask"] = 1
+        # df[f"fixed_water_code_{i}_namask"] = 1
 
     df = df.drop(columns=["water_code"])
 
@@ -50,7 +50,7 @@ def fix_column(df, column, column_type, nan_encoding):
         if nan_encoding:
             df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, np.nan)
 
-        df[f"fixed_{column}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
+        # df[f"fixed_{column}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].fillna(
             df[f"fixed_{column}_{column_type}"].median()
         )
@@ -59,7 +59,7 @@ def fix_column(df, column, column_type, nan_encoding):
         df[f"fixed_{column}_{column_type}"] = df[column]
         if nan_encoding:
             df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].replace(nan_encoding, np.nan)
-        df[f"fixed_{column}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
+        # df[f"fixed_{column}_namask"] = (~df[f"fixed_{column}_{column_type}"].isna()).astype(int)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].fillna(-1)
         df[f"fixed_{column}_{column_type}"] = df[f"fixed_{column}_{column_type}"].astype("category")
 
@@ -72,7 +72,7 @@ def fix_column(df, column, column_type, nan_encoding):
     elif column_type == "date":
         df[f"fixed_{column}_{column_type}"] = df[column]
         df[f"fixed_{column}_{column_type}"] = pd.to_datetime(df[f"fixed_{column}_{column_type}"])
-        df[f"fixed_{column}_namask"] = 1
+        # df[f"fixed_{column}_namask"] = 1
 
 
 def fix_df(df, df_name):
@@ -184,9 +184,9 @@ def add_predecessor_hydro(features_df, flow):
 
 
 def add_keys(features_df):
-    features_df["year"] = features_df["hydro_fixed_year_categorical"]
-    features_df["day"] = features_df["hydro_fixed_day_categorical"]
-    features_df["hydro_station_id"] = features_df["hydro_fixed_station_id_categorical"]
+    features_df["year"] = features_df["hydro_fixed_year_categorical"].values.copy()
+    features_df["day"] = features_df["hydro_fixed_day_categorical"].values.copy()
+    features_df["hydro_station_id"] = features_df["hydro_fixed_station_id_categorical"].values.copy()
 
     return features_df
 

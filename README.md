@@ -1,43 +1,57 @@
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 # Emergeny Hack 2021 - Команда "Звездочка", 1й трек
 
 https://emergencydatahack.ru
 
 # Структура каталога
-* src - код проекта
-* notebooks - ноутбуки проекта (экспериметы и анализ данных)
-* data - данные (не выгружены d htgjpbnjhbq)
-* Emergency Hack 2021.pdf - презентация проекта
+* `src` - код проекта
+* `notebooks` - ноутбуки проекта (эксперименты и анализ данных)
+* `data/track_1` - данные архива track_1 (необходимо добавить вручную)
+* `Emergency Hack 2021.pdf` - презентация проекта
 
+# Воспроизводимость
+Следующие ноутбуки содержат обучение модели и генерацию файла с предсказаниями. Их можно запустить на [Google Colab](https://colab.research.google.com/). Ноутбук обучения содержит в себе код загрузки данных.
+ - `notebooks/train.ipynb`
+ - `notebooks/inference.ipynb`
 
-# Installation
+# Установка
+## При помощи `poetry`:
 ```bash
 poetry install
 pre-commit install
 ```
 
-Place the `track_1` directory at `data/track_1`.
-
-# Usage
+## При помощи Docker-Compose
 Start the container:
 
 ```bash
 docker-compose build star
+```
+
+# Использование
+Инструкции написаны для запуска в `docker` контейнере. Для локального запуска команды остаются аналогичными.
+
+Запустите контейнер:
+
+
+```bash
 docker-compose run star bash
 ```
 
-Create the features dataframe:
+Создайте таблицу с признаками:
 
 ```bash
 python src/make_features_df.py
 ````
 
-Train the model (to skip this step create a `data/model-checkpoints/model.ckpt` file):
+Обучите модель (этот шаг можно пропустить, если поместить уже имеющийся checkpoint модели в `data/model-checkpoints/model.ckpt`):
 
 ```bash
 python src/train_bi_trans.py batch_size=8 model.top_classifier_units=32
 ```
 
-Full configuration:
+Все опции конфигурации запуска скрипта обучения можно посмотреть в `src/config/train.py`:
 ```python
 @dataclass
 class BiTransModelConfig:
@@ -65,13 +79,13 @@ class TrainBiTransConfig:
     patience: int = 20
 ```
 
-Copy the best checkpoint to `data/model-checkpoints/model.ckpt`.
+Скопируйте лучший checkpoint в  `data/model-checkpoints/model.ckpt`.
 
-Run the inference:
+Сгенерируйте предсказания:
 
 ```bash
 # better to set lower num_workers in order to avoid resources issues
 python src/inference.py batch_size=32 num_workers=4 submission_path=/emergency/data/submissions/docker_submission.csv
 ```
 
-The submission file will be written to `data/submissions/docker_submission.csv`.
+Файл с предсказаниями будет записан в to `data/submissions/docker_submission.csv`.
