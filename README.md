@@ -8,9 +8,6 @@ https://emergencydatahack.ru
 * data - данные (не выгружены d htgjpbnjhbq)
 * Emergency Hack 2021.pdf - презентация проекта
 
-# Emergeny Hack 2021 - Команда "Звездочка", 1й трек
-
-https://emergencydatahack.ru
 
 # Installation
 ```bash
