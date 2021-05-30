@@ -175,18 +175,32 @@ class LenaDataModule(pl.LightningDataModule):
     def train_dataloader(self) -> Union[DataLoader, List[DataLoader], Dict[str, DataLoader]]:
         train_sampler = RandomSampler(self.train_ds)
         return DataLoader(
-            self.train_ds, sampler=train_sampler, batch_size=self.batch_size, num_workers=self.num_workers
+            self.train_ds,
+            sampler=train_sampler,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=True,
         )
 
     def val_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
         valid_sampler = SequentialSampler(self.valid_ds)
         return DataLoader(
-            self.valid_ds, sampler=valid_sampler, batch_size=self.batch_size, num_workers=self.num_workers
+            self.valid_ds,
+            sampler=valid_sampler,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=True,
         )
 
     def predict_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
         test_sampler = SequentialSampler(self.test_ds)
-        return DataLoader(self.test_ds, sampler=test_sampler, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(
+            self.test_ds,
+            sampler=test_sampler,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=True,
+        )
 
 
 class LenaDataModuleExtra(pl.LightningDataModule):

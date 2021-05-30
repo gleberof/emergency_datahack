@@ -1,7 +1,6 @@
 import hydra
 import pytorch_lightning as pl
 import torch
-from optuna.integration import PyTorchLightningPruningCallback
 from pytorch_lightning.callbacks import EarlyStopping, GPUStatsMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
@@ -31,8 +30,8 @@ def train(cfg: TrainBiTransConfig, trial=None):
     )
 
     early_stopping = EarlyStopping(monitor="Val/f1_score", patience=cfg.patience)
-    if trial:
-        early_stopping = PyTorchLightningPruningCallback(monitor="Val/f1_score", trial=trial)  # type: ignore
+    # if trial:
+    #     early_stopping = PyTorchLightningPruningCallback(monitor="Val/f1_score", trial=trial)  # type: ignore
 
     gpu_monitor = GPUStatsMonitor()
 
